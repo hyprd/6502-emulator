@@ -6,8 +6,9 @@ if (POLICY CMP0141)
 endif()
 
 project ("6502-emulator")
+set(SOURCES "tests/tests.cpp" "src/6502.cpp")
 
-add_executable (6502-emulator "6502.cpp" "6502.h")
+add_executable (6502-emulator ${SOURCES})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 6502-emulator PROPERTY CXX_STANDARD 20)
@@ -26,16 +27,9 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(
-  tests
-  tests.cpp
-)
-
-target_link_libraries(
-  tests
-  GTest::gtest_main
-)
+set(CMAKE_EXECUTABLE_E)
+target_link_libraries(6502-emulator GTest::gtest_main)
 
 include(GoogleTest)
-gtest_discover_tests(tests)
+gtest_discover_tests(6502-emulator)
 
