@@ -791,7 +791,13 @@ void NMOS6502::Opcode0xB8() {
 }
 
 void NMOS6502::Opcode0xB9() {
-
+	u16 BaseAddress = FetchWord();
+	u16 EffectiveAddress = BaseAddress + Y;
+	if ((BaseAddress & 0xFF00) != (EffectiveAddress & 0xFF00)) { // Page boundary cross
+		Cycle();
+	}
+	A = Memory[EffectiveAddress];
+	Cycle();
 }
 
 void NMOS6502::Opcode0xBA() {
@@ -807,7 +813,13 @@ void NMOS6502::Opcode0xBC() {
 }
 
 void NMOS6502::Opcode0xBD() {
-
+	u16 BaseAddress = FetchWord();
+	u16 EffectiveAddress = BaseAddress + X;
+	if ((BaseAddress & 0xFF00) != (EffectiveAddress & 0xFF00)) { // Page boundary cross
+		Cycle();
+	}
+	A = Memory[EffectiveAddress];
+	Cycle();
 }
 
 void NMOS6502::Opcode0xBE() {
