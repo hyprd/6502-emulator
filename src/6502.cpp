@@ -28,6 +28,13 @@ u8 NMOS6502::FetchByte()
 	return Memory[PC++];
 }
 
+u16 NMOS6502::FetchWord() {
+	CyclesPerformed += 2;
+	u16 word = static_cast<u16>(Memory[PC] << 8 | Memory[PC + 1] & 0x00FF);
+	PC += 2;
+	return word;
+}
+
 void NMOS6502::Execute(u32 CyclesRequired) {
 	CyclesPerformed = 0;
 	while (CyclesRequired > CyclesPerformed) {
@@ -35,6 +42,10 @@ void NMOS6502::Execute(u32 CyclesRequired) {
 		(this->*Opcodes[inst])();
 	}
 	++PC;
+}
+
+void NMOS6502::Cycle() {
+	++CyclesPerformed;
 }
 
 void NMOS6502::Opcode0x00() {
@@ -732,7 +743,9 @@ void NMOS6502::Opcode0xAC() {
 }
 
 void NMOS6502::Opcode0xAD() {
-
+	u16 EffectiveAddress = FetchWord();
+	A = Memory[EffectiveAddress];
+	Cycle();
 }
 
 void NMOS6502::Opcode0xAE() {

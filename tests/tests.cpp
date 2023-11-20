@@ -4,6 +4,7 @@
 class M6502TestSuite : public testing::Test {
 public:
 	NMOS6502 M6502;
+	u32 InstructionCycles = 0;
 
 	virtual void SetUp() {
 		M6502.Reset();
@@ -15,12 +16,22 @@ public:
 };
 
 TEST_F(M6502TestSuite, LDA_IMM) {
-	u32 InstructionCycles = 2;
-	M6502.PC = 0xFFFC;
+	InstructionCycles = 2;
 	M6502.Memory[0xFFFC] = 0xA9;
 	M6502.Memory[0xFFFD] = 0x42;
 	M6502.Execute(InstructionCycles);
 	ASSERT_EQ(M6502.A, 0x42);
+	ASSERT_EQ(M6502.CyclesPerformed, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDA_ABS) {
+	InstructionCycles = 4;
+	M6502.Memory[0xFFFC] = 0xAD;
+	M6502.Memory[0xFFFD] = 0xBC;
+	M6502.Memory[0xFFFE] = 0xA1;
+	M6502.Memory[0xBCA1] = 0x90;
+	M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.A, 0x90);
 	ASSERT_EQ(M6502.CyclesPerformed, InstructionCycles);
 }
 

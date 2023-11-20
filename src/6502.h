@@ -23,7 +23,10 @@ public:
 	void BindOpcodes();
 	void Reset();
 	void Execute(u32 CyclesRequired);
+	void Cycle();
+
 	u8 FetchByte();
+	u16 FetchWord();
 
 	void Opcode0x00();
 	void Opcode0x01();
