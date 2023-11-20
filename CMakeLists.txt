@@ -7,7 +7,6 @@ endif()
 
 project ("6502-emulator")
 set(SOURCES "tests/tests.cpp" "src/6502.cpp")
-
 add_executable (6502-emulator ${SOURCES})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
@@ -15,7 +14,6 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
 endif()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -24,12 +22,8 @@ FetchContent_Declare(
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
-
 enable_testing()
-
 set(CMAKE_EXECUTABLE_E)
 target_link_libraries(6502-emulator GTest::gtest_main)
-
 include(GoogleTest)
 gtest_discover_tests(6502-emulator)
-
