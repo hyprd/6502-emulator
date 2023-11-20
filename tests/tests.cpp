@@ -95,7 +95,7 @@ TEST_F(M6502TestSuite, LDA_ZP) {
 
 TEST_F(M6502TestSuite, LDA_ZP_X) {
 	InstructionCycles = 4;
-	M6502.Memory[0xFFFC] = 0xA1;
+	M6502.Memory[0xFFFC] = 0xB5;
 
 	/* Test address overflowing 0xFF */
 	M6502.Memory[0xFFFD] = 0xFE;
