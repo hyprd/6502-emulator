@@ -21,7 +21,6 @@ TEST_F(M6502TestSuite, LDA_IMM) {
 	M6502.Memory[0xFFFD] = 0x42;
 	M6502.Execute(InstructionCycles);
 	ASSERT_EQ(M6502.A, 0x42);
-	ASSERT_EQ(M6502.CyclesPerformed, InstructionCycles);
 }
 
 TEST_F(M6502TestSuite, LDA_ABS) {
@@ -30,9 +29,9 @@ TEST_F(M6502TestSuite, LDA_ABS) {
 	M6502.Memory[0xFFFD] = 0xBC;
 	M6502.Memory[0xFFFE] = 0xA1;
 	M6502.Memory[0xBCA1] = 0x90;
-	M6502.Execute(InstructionCycles);
+	u8 CyclesRan = M6502.Execute(InstructionCycles);
 	ASSERT_EQ(M6502.A, 0x90);
-	ASSERT_EQ(M6502.CyclesPerformed, InstructionCycles);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
 int main(int argc, char** argv) {

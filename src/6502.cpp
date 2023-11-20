@@ -35,13 +35,11 @@ u16 NMOS6502::FetchWord() {
 	return word;
 }
 
-void NMOS6502::Execute(u32 CyclesRequired) {
+int NMOS6502::Execute(u32 CyclesRequired) {
 	CyclesPerformed = 0;
-	while (CyclesRequired > CyclesPerformed) {
-		u8 inst = FetchByte();
-		(this->*Opcodes[inst])();
-	}
-	++PC;
+	u8 inst = FetchByte();
+	(this->*Opcodes[inst])();
+	return CyclesPerformed;
 }
 
 void NMOS6502::Cycle() {

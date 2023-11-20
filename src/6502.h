@@ -22,7 +22,7 @@ public:
 
 	void BindOpcodes();
 	void Reset();
-	void Execute(u32 CyclesRequired);
+	int Execute(u32 CyclesRequired);
 	void Cycle();
 
 	u8 FetchByte();
