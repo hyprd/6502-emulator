@@ -81,7 +81,36 @@ TEST_F(M6502TestSuite, LDA_ABS_Y) {
 	CyclesRan = M6502.Execute(InstructionCycles - 1);
 	ASSERT_EQ(M6502.A, 0x87);
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
+}
 
+TEST_F(M6502TestSuite, LDA_ZP) {
+	InstructionCycles = 3;
+	M6502.Memory[0xFFFC] = 0xA5;
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Memory[0x42] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.A, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDA_ZP_X) {
+	InstructionCycles = 4;
+	M6502.Memory[0xFFFC] = 0xA1;
+
+	/* Test address overflowing 0xFF */
+	M6502.Memory[0xFFFD] = 0xFE;
+	M6502.X = 0x10;
+	M6502.Memory[0x0E] = 0x42;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.A, 0x42);
+
+	/* Test address not overflowing 0xFF */
+	M6502.PC = 0xFFFC;
+	M6502.X = 0x01;
+	M6502.Memory[0xFF] = 0x42;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.A, 0x42);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
 int main(int argc, char** argv) {

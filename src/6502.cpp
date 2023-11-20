@@ -691,7 +691,11 @@ void NMOS6502::Opcode0xA0() {
 }
 
 void NMOS6502::Opcode0xA1() {
-
+	u8 ZeroPage = FetchByte();
+	u8 EffectiveAddress = ZeroPage + X; // Wrapping around when > 0xFF is intended behaviour
+	Cycle();
+	A = Memory[EffectiveAddress];
+	Cycle();
 }
 
 void NMOS6502::Opcode0xA2() {
@@ -707,7 +711,9 @@ void NMOS6502::Opcode0xA4() {
 }
 
 void NMOS6502::Opcode0xA5() {
-
+	u8 ZeroPage = FetchByte();
+	A = Memory[ZeroPage];
+	Cycle();
 }
 
 void NMOS6502::Opcode0xA6() {
@@ -725,7 +731,6 @@ void NMOS6502::Opcode0xA8() {
 void NMOS6502::Opcode0xA9() {
 	u8 imm = FetchByte();
 	A = imm;
-	//handleFlags(LDA);
 }
 
 void NMOS6502::Opcode0xAA() {
