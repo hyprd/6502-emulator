@@ -152,6 +152,39 @@ TEST_F(M6502TestSuite, LDA_IND_Y) {
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
 
+TEST_F(M6502TestSuite, LDX_IMM) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0xA2;
+
+	M6502.Memory[0xFFFD] = 0x42;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.X, 0x42);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDX_ZP) {
+	InstructionCycles = 3;
+	M6502.Memory[0xFFFC] = 0xA6;
+
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Memory[0x42] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.X, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDX_ZP_Y) {
+	InstructionCycles = 4;
+	M6502.Memory[0xFFFC] = 0xB6;
+
+	M6502.Y = 0x01;
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Memory[0x43] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.X, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
 int main(int argc, char** argv) {
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

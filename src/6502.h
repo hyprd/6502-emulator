@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <algorithm>
+#include <bitset>
 
 using u8 = uint8_t;
 using u16 = uint16_t;
@@ -20,10 +21,37 @@ public:
 	typedef void (NMOS6502::* Opcode)(void);
 	Opcode Opcodes[0x100];
 
+	enum INSTRUCTION {
+		ADC, AND, ASL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, 
+		BRK, BVC, BVS, CLC, CLD, CLI, CLV, CMP, CPX, CPY, 
+		DEC, DEX, DEY, EOR, INC, INX, INY, JMP, JSR, LDA, 
+		LDX, LDY, LSR, NOP, ORA, PHA, PHP, PLA, PLP, ROL, 
+		ROR, RTI, RTS, SBC, SEC, SED, SEI, STA, STX, STY, 
+		TAX, TAY, TSX, TXA, TXS, TYA
+	};
+
+	enum FLAGS {
+		C = 0,
+		Z = 1,
+		I = 2,
+		D = 3,
+		B = 4,
+		V = 5,
+		N = 6
+	};
+
+	std::bitset<7> ProcessorStatus;
+	void HandleFlags(INSTRUCTION i);
+
 	void BindOpcodes();
 	void Reset();
 	int Execute(u32 CyclesRequired);
 	void Cycle();
+	
+	template <typename T>
+	void PrintHex(T t) {
+		std::cout << std::hex << std::uppercase << +t << '\n';
+	}
 
 	u8 FetchByte();
 	u16 FetchWord();
