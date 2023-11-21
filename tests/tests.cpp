@@ -12,7 +12,7 @@ public:
 	}
 
 	virtual void TearDown() {
-
+		//ASSERT_EQ(CyclesRan, InstructionCycles);
 	}
 };
 
@@ -183,6 +183,43 @@ TEST_F(M6502TestSuite, LDX_ZP_Y) {
 	CyclesRan = M6502.Execute(InstructionCycles);
 	ASSERT_EQ(M6502.X, 0x90);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDX_ABS) {
+	InstructionCycles = 4;
+	M6502.Memory[0xFFFC] = 0xAE;
+
+	M6502.Memory[0xFFFD] = 0xBC;
+	M6502.Memory[0xFFFE] = 0xA1;
+
+	M6502.Memory[0xBCA1] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.X, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+	
+}
+
+TEST_F(M6502TestSuite, LDX_ABS_Y) {
+	InstructionCycles = 5;
+	M6502.Memory[0xFFFC] = 0xBE;
+	M6502.Y = 0x01;
+
+	/* Test page boundary being crossed */
+	M6502.Memory[0xFFFD] = 0xF2;
+	M6502.Memory[0xFFFE] = 0xFF;
+	M6502.Memory[0xF300] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.X, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+
+	/* Test page boundary not being crossed */
+	M6502.PC = 0xFFFC;
+	M6502.Memory[0xFFFE] = 0x98;
+	M6502.Memory[0xF299] = 0x87;
+	CyclesRan = M6502.Execute(InstructionCycles - 1);
+	ASSERT_EQ(M6502.X, 0x87);
+	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
+
 }
 
 int main(int argc, char** argv) {
