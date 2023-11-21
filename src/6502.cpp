@@ -31,9 +31,9 @@ u8 NMOS6502::FetchByte()
 
 u16 NMOS6502::FetchWord() {
 	CyclesPerformed += 2;
-	u16 word = static_cast<u16>(Memory[PC] << 8 | Memory[++PC] & 0x00FF);
-	PC += 1;
-	return word;
+	u16 Word = static_cast<u16>(Memory[PC] << 8 | Memory[static_cast<u16>(PC + 1)] & 0x00FF);
+	PC += 2;
+	return Word;
 }
 
 void NMOS6502::HandleFlags(INSTRUCTION i) {
@@ -770,7 +770,9 @@ void NMOS6502::Opcode0xAC() {
 
 void NMOS6502::Opcode0xAD() {
 	u16 EffectiveAddress = FetchWord();
+	PrintHex(EffectiveAddress);
 	A = Memory[EffectiveAddress];
+	PrintHex(A);
 	Cycle();
 	HandleFlags(LDA);
 }
