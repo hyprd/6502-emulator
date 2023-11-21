@@ -691,7 +691,16 @@ void NMOS6502::Opcode0xA0() {
 }
 
 void NMOS6502::Opcode0xA1() {
-	
+	u8 ZeroPage = FetchByte();
+	u8 BaseAddress = ZeroPage + X;
+	u8 Low = Memory[BaseAddress];
+	Cycle();
+	u8 High = Memory[BaseAddress + 1];
+	Cycle();
+	u16 EffectiveAddress = Low | (High << 8);
+	Cycle();
+	A = Memory[EffectiveAddress];
+	Cycle();
 }
 
 void NMOS6502::Opcode0xA2() {
@@ -760,7 +769,18 @@ void NMOS6502::Opcode0xB0() {
 }
 
 void NMOS6502::Opcode0xB1() {
-
+	u8 ZeroPage = FetchByte();
+	u8 Low = Memory[ZeroPage];
+	Cycle();
+	u8 High = Memory[ZeroPage + 1];
+	Cycle();
+	u16 EffectiveAddress = (Low | (High << 8));
+	if ((EffectiveAddress & 0xFF00) != ((EffectiveAddress + Y) & 0xFF00)) {
+		Cycle();
+	}
+	EffectiveAddress += Y;
+	A = Memory[EffectiveAddress];
+	Cycle();
 }
 
 void NMOS6502::Opcode0xB2() {

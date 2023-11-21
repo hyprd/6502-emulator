@@ -113,6 +113,45 @@ TEST_F(M6502TestSuite, LDA_ZP_X) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
+TEST_F(M6502TestSuite, LDA_IND_X) {
+	InstructionCycles = 6;
+	M6502.Memory[0xFFFC] = 0xA1;
+
+	M6502.Memory[0xFFFD] = 0xF0;
+	M6502.X = 0x01;
+	M6502.Memory[0xF1] = 0xAA;
+	M6502.Memory[0xF2] = 0x0A;
+	M6502.Memory[0x0AAA] = 0x90;
+
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.A, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDA_IND_Y) {
+	InstructionCycles = 6;
+	M6502.Memory[0xFFFC] = 0xB1;
+
+	/* Test for page boundary being crossed */
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Memory[0x42] = 0xFF;
+	M6502.Memory[0x43] = 0x01;
+	M6502.Y = 0x01;
+	M6502.Memory[0x200] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.A, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+
+	/* Test for page boundary not being crossed */
+	M6502.PC = 0xFFFC;
+	M6502.Memory[0x42] = 0xFE;
+	M6502.Memory[0x43] = 0x00;
+	M6502.Memory[0xFF] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles - 1);
+	ASSERT_EQ(M6502.A, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
+}
+
 int main(int argc, char** argv) {
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
