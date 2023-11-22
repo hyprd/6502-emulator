@@ -56,6 +56,13 @@ public:
 	u8 FetchByte();
 	u16 FetchWord();
 
+	u16 GetIndirectX();
+	u16 GetIndirectY(bool CheckBoundary = false);
+	u16 GetAbsoluteX(bool CheckBoundary = false);
+	u16 GetAbsoluteY(bool CheckBoundary = false);
+	u8 GetZeroPageX();
+	u8 GetZeroPageY();
+
 	void Opcode0x00();
 	void Opcode0x01();
 	void Opcode0x02();
