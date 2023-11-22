@@ -219,7 +219,75 @@ TEST_F(M6502TestSuite, LDX_ABS_Y) {
 	CyclesRan = M6502.Execute(InstructionCycles - 1);
 	ASSERT_EQ(M6502.X, 0x87);
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
+}
 
+TEST_F(M6502TestSuite, LDY_IMM) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0xA0;
+
+	M6502.Memory[0xFFFD] = 0x42;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.Y, 0x42);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDY_ZP) {
+	InstructionCycles = 3;
+	M6502.Memory[0xFFFC] = 0xA4;
+
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Memory[0x42] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.Y, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDY_ZP_X) {
+	InstructionCycles = 4;
+	M6502.Memory[0xFFFC] = 0xB4;
+
+	M6502.X = 0x01;
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Memory[0x43] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.Y, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TestSuite, LDY_ABS) {
+	InstructionCycles = 4;
+	M6502.Memory[0xFFFC] = 0xAC;
+
+	M6502.Memory[0xFFFD] = 0xBC;
+	M6502.Memory[0xFFFE] = 0xA1;
+
+	M6502.Memory[0xBCA1] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.Y, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+
+}
+
+TEST_F(M6502TestSuite, LDY_ABS_X) {
+	InstructionCycles = 5;
+	M6502.Memory[0xFFFC] = 0xBC;
+	M6502.X = 0x01;
+
+	/* Test page boundary being crossed */
+	M6502.Memory[0xFFFD] = 0xF2;
+	M6502.Memory[0xFFFE] = 0xFF;
+	M6502.Memory[0xF300] = 0x90;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.Y, 0x90);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+
+	/* Test page boundary not being crossed */
+	M6502.PC = 0xFFFC;
+	M6502.Memory[0xFFFE] = 0x98;
+	M6502.Memory[0xF299] = 0x87;
+	CyclesRan = M6502.Execute(InstructionCycles - 1);
+	ASSERT_EQ(M6502.Y, 0x87);
+	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
 
 int main(int argc, char** argv) {
