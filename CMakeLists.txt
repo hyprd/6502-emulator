@@ -6,8 +6,8 @@ if (POLICY CMP0141)
 endif()
 
 project ("6502-emulator")
-set(SOURCES "tests/LD.cpp" "tests/INC_DEC.cpp" "src/6502.cpp")
-add_executable (6502-emulator ${SOURCES})
+set(SOURCES "tests/transfer.cpp" "tests/increment_decrement.cpp" "tests/logic.cpp" "src/6502.cpp")
+add_executable (6502-emulator ${SOURCES} "tests/logic.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 6502-emulator PROPERTY CXX_STANDARD 20)
