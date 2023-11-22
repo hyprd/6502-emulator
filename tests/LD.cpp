@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../src/6502.h"
 
-class M6502TestSuite : public testing::Test {
+class M6502LDTestSuite : public testing::Test {
 public:
 	NMOS6502 M6502;
 	u32 InstructionCycles = 0;
@@ -12,11 +12,10 @@ public:
 	}
 
 	virtual void TearDown() {
-		//ASSERT_EQ(CyclesRan, InstructionCycles);
 	}
 };
 
-TEST_F(M6502TestSuite, LDA_IMM) {
+TEST_F(M6502LDTestSuite, LDA_IMM) {
 	InstructionCycles = 2;
 	M6502.Memory[0xFFFC] = 0xA9;
 
@@ -26,7 +25,7 @@ TEST_F(M6502TestSuite, LDA_IMM) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDA_ABS) {
+TEST_F(M6502LDTestSuite, LDA_ABS) {
 	InstructionCycles = 4;
 	M6502.Memory[0xFFFC] = 0xAD;
 
@@ -39,7 +38,7 @@ TEST_F(M6502TestSuite, LDA_ABS) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDA_ABS_X) {
+TEST_F(M6502LDTestSuite, LDA_ABS_X) {
 	InstructionCycles = 5;
 	M6502.Memory[0xFFFC] = 0xBD;
 	M6502.X = 0x01;
@@ -61,7 +60,7 @@ TEST_F(M6502TestSuite, LDA_ABS_X) {
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
 
-TEST_F(M6502TestSuite, LDA_ABS_Y) {
+TEST_F(M6502LDTestSuite, LDA_ABS_Y) {
 	InstructionCycles = 5;
 	M6502.Memory[0xFFFC] = 0xB9;
 	M6502.Y = 0x01;
@@ -83,7 +82,7 @@ TEST_F(M6502TestSuite, LDA_ABS_Y) {
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
 
-TEST_F(M6502TestSuite, LDA_ZP) {
+TEST_F(M6502LDTestSuite, LDA_ZP) {
 	InstructionCycles = 3;
 	M6502.Memory[0xFFFC] = 0xA5;
 	M6502.Memory[0xFFFD] = 0x42;
@@ -93,7 +92,7 @@ TEST_F(M6502TestSuite, LDA_ZP) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDA_ZP_X) {
+TEST_F(M6502LDTestSuite, LDA_ZP_X) {
 	InstructionCycles = 4;
 	M6502.Memory[0xFFFC] = 0xB5;
 
@@ -113,7 +112,7 @@ TEST_F(M6502TestSuite, LDA_ZP_X) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDA_IND_X) {
+TEST_F(M6502LDTestSuite, LDA_IND_X) {
 	InstructionCycles = 6;
 	M6502.Memory[0xFFFC] = 0xA1;
 
@@ -128,7 +127,7 @@ TEST_F(M6502TestSuite, LDA_IND_X) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDA_IND_Y) {
+TEST_F(M6502LDTestSuite, LDA_IND_Y) {
 	InstructionCycles = 6;
 	M6502.Memory[0xFFFC] = 0xB1;
 
@@ -152,7 +151,7 @@ TEST_F(M6502TestSuite, LDA_IND_Y) {
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
 
-TEST_F(M6502TestSuite, LDX_IMM) {
+TEST_F(M6502LDTestSuite, LDX_IMM) {
 	InstructionCycles = 2;
 	M6502.Memory[0xFFFC] = 0xA2;
 
@@ -162,7 +161,7 @@ TEST_F(M6502TestSuite, LDX_IMM) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDX_ZP) {
+TEST_F(M6502LDTestSuite, LDX_ZP) {
 	InstructionCycles = 3;
 	M6502.Memory[0xFFFC] = 0xA6;
 
@@ -173,7 +172,7 @@ TEST_F(M6502TestSuite, LDX_ZP) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDX_ZP_Y) {
+TEST_F(M6502LDTestSuite, LDX_ZP_Y) {
 	InstructionCycles = 4;
 	M6502.Memory[0xFFFC] = 0xB6;
 
@@ -185,7 +184,7 @@ TEST_F(M6502TestSuite, LDX_ZP_Y) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDX_ABS) {
+TEST_F(M6502LDTestSuite, LDX_ABS) {
 	InstructionCycles = 4;
 	M6502.Memory[0xFFFC] = 0xAE;
 
@@ -199,7 +198,7 @@ TEST_F(M6502TestSuite, LDX_ABS) {
 	
 }
 
-TEST_F(M6502TestSuite, LDX_ABS_Y) {
+TEST_F(M6502LDTestSuite, LDX_ABS_Y) {
 	InstructionCycles = 5;
 	M6502.Memory[0xFFFC] = 0xBE;
 	M6502.Y = 0x01;
@@ -221,7 +220,7 @@ TEST_F(M6502TestSuite, LDX_ABS_Y) {
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
 
-TEST_F(M6502TestSuite, LDY_IMM) {
+TEST_F(M6502LDTestSuite, LDY_IMM) {
 	InstructionCycles = 2;
 	M6502.Memory[0xFFFC] = 0xA0;
 
@@ -231,7 +230,7 @@ TEST_F(M6502TestSuite, LDY_IMM) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDY_ZP) {
+TEST_F(M6502LDTestSuite, LDY_ZP) {
 	InstructionCycles = 3;
 	M6502.Memory[0xFFFC] = 0xA4;
 
@@ -242,7 +241,7 @@ TEST_F(M6502TestSuite, LDY_ZP) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDY_ZP_X) {
+TEST_F(M6502LDTestSuite, LDY_ZP_X) {
 	InstructionCycles = 4;
 	M6502.Memory[0xFFFC] = 0xB4;
 
@@ -254,7 +253,7 @@ TEST_F(M6502TestSuite, LDY_ZP_X) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
-TEST_F(M6502TestSuite, LDY_ABS) {
+TEST_F(M6502LDTestSuite, LDY_ABS) {
 	InstructionCycles = 4;
 	M6502.Memory[0xFFFC] = 0xAC;
 
@@ -268,7 +267,7 @@ TEST_F(M6502TestSuite, LDY_ABS) {
 
 }
 
-TEST_F(M6502TestSuite, LDY_ABS_X) {
+TEST_F(M6502LDTestSuite, LDY_ABS_X) {
 	InstructionCycles = 5;
 	M6502.Memory[0xFFFC] = 0xBC;
 	M6502.X = 0x01;
@@ -288,9 +287,4 @@ TEST_F(M6502TestSuite, LDY_ABS_X) {
 	CyclesRan = M6502.Execute(InstructionCycles - 1);
 	ASSERT_EQ(M6502.Y, 0x87);
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
-}
-
-int main(int argc, char** argv) {
-	testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
 }
