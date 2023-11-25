@@ -754,7 +754,9 @@ void NMOS6502::Opcode0x89() {
 }
 
 void NMOS6502::Opcode0x8A() {
-
+	A = X;
+	Cycle();
+	HandleFlags(TXA);
 }
 
 void NMOS6502::Opcode0x8B() {
@@ -835,7 +837,9 @@ void NMOS6502::Opcode0x97() {
 }
 
 void NMOS6502::Opcode0x98() {
-
+	A = Y;
+	Cycle();
+	HandleFlags(TYA);
 }
 
 void NMOS6502::Opcode0x99() {
@@ -847,7 +851,9 @@ void NMOS6502::Opcode0x99() {
 }
 
 void NMOS6502::Opcode0x9A() {
-
+	SP = X;
+	Cycle();
+	HandleFlags(TXS);
 }
 
 void NMOS6502::Opcode0x9B() {
@@ -923,7 +929,9 @@ void NMOS6502::Opcode0xA7() {
 }
 
 void NMOS6502::Opcode0xA8() {
-
+	Y = A;
+	Cycle();
+	HandleFlags(TAY);
 }
 
 void NMOS6502::Opcode0xA9() {
@@ -933,7 +941,9 @@ void NMOS6502::Opcode0xA9() {
 }
 
 void NMOS6502::Opcode0xAA() {
-
+	X = A;
+	Cycle();
+	HandleFlags(TAX);
 }
 
 void NMOS6502::Opcode0xAB() {
@@ -1021,7 +1031,9 @@ void NMOS6502::Opcode0xB9() {
 }
 
 void NMOS6502::Opcode0xBA() {
-
+	X = SP;
+	Cycle();
+	HandleFlags(TSX);
 }
 
 void NMOS6502::Opcode0xBB() {

@@ -468,5 +468,70 @@ TEST_F(M6502TransferTestSuite, STY_ABS) {
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
+TEST_F(M6502TransferTestSuite, TAX) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0xAA;
+
+	M6502.A = 0x01;
+	M6502.X = 0x00;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.X, 0x01);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TransferTestSuite, TAY) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0xA8;
+
+	M6502.A = 0x01;
+	M6502.Y = 0x00;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.Y, 0x01);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TransferTestSuite, TSX) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0xBA;
+
+	M6502.SP = 0x01;
+	M6502.X = 0x00;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.X, 0x01);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TransferTestSuite, TXA) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0x8A;
+
+	M6502.A = 0x00;
+	M6502.X = 0x01;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.A, 0x01);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TransferTestSuite, TXS) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0x9A;
+
+	M6502.SP = 0x00;
+	M6502.X = 0x01;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.SP, 0x01);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502TransferTestSuite, TYA) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0x98;
+
+	M6502.A = 0x00;
+	M6502.Y = 0x01;
+	CyclesRan = M6502.Execute(InstructionCycles);
+	ASSERT_EQ(M6502.A, 0x01);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
 
 
