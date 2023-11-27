@@ -47,8 +47,8 @@ void NMOS6502::HandleFlags(INSTRUCTION i) {
 
 int NMOS6502::Execute(u32 CyclesRequired) {
 	CyclesPerformed = 0;
-	u8 inst = FetchByte();
-	(this->*Opcodes[inst])();
+	u8 Instruction = FetchByte();
+	(this->*Opcodes[Instruction])();
 	return CyclesPerformed;
 }
 
@@ -118,6 +118,24 @@ u8 NMOS6502::GetZeroPageY() {
 
 void NMOS6502::Cycle() {
 	++CyclesPerformed;
+}
+
+void NMOS6502::Branch(u8 Byte) {
+	PC -= 2; // Execute, FetchByte ops execute before running this function
+	if (Byte > 0x7F) {
+		uint8_t BranchOffset = pow(2, 8) - Byte;
+		if ((PC & 0xFF00) != ((PC - BranchOffset) & 0xFF00)) {
+			Cycle();
+		}
+		PC -= BranchOffset;
+	}
+	else {
+		if ((PC & 0xFF00) != ((PC + Byte) & 0xFF00)) { 
+			Cycle();
+		}
+		PC += Byte;
+	}
+	Cycle();
 }
 
 void NMOS6502::Opcode0x00() {
@@ -196,7 +214,13 @@ void NMOS6502::Opcode0x0F() {
 }
 
 void NMOS6502::Opcode0x10() {
-
+	if (ProcessorStatus.test(N) == 0) {
+		Branch(FetchByte());
+	}
+	else {
+		Cycle();
+	}
+	HandleFlags(BPL);
 }
 
 void NMOS6502::Opcode0x11() {
@@ -348,7 +372,13 @@ void NMOS6502::Opcode0x2F() {
 }
 
 void NMOS6502::Opcode0x30() {
-
+	if (ProcessorStatus.test(N) == 1) {
+		Branch(FetchByte());
+	}
+	else {
+		Cycle();
+	}
+	HandleFlags(BMI);
 }
 
 void NMOS6502::Opcode0x31() {
@@ -500,7 +530,13 @@ void NMOS6502::Opcode0x4F() {
 }
 
 void NMOS6502::Opcode0x50() {
-
+	if (ProcessorStatus.test(V) == 0) {
+		Branch(FetchByte());
+	}
+	else {
+		Cycle();
+	}
+	HandleFlags(BVC);
 }
 
 void NMOS6502::Opcode0x51() {
@@ -642,7 +678,13 @@ void NMOS6502::Opcode0x6F() {
 }
 
 void NMOS6502::Opcode0x70() {
-
+	if (ProcessorStatus.test(V) == 1) {
+		Branch(FetchByte());
+	}
+	else {
+		Cycle();
+	}
+	HandleFlags(BVS);
 }
 
 void NMOS6502::Opcode0x71() {
@@ -797,7 +839,13 @@ void NMOS6502::Opcode0x8F() {
 }
 
 void NMOS6502::Opcode0x90() {
-
+	if (ProcessorStatus.test(C) == 0) {
+		Branch(FetchByte());
+	}
+	else {
+		Cycle();
+	}
+	HandleFlags(BCC);
 }
 
 void NMOS6502::Opcode0x91() {
@@ -819,7 +867,7 @@ void NMOS6502::Opcode0x93() {
 void NMOS6502::Opcode0x94() {
 	u8 ZeroPage = FetchByte();
 	Cycle();
-	Memory[ZeroPage + X] = Y;
+	Memory[static_cast<u16>(ZeroPage + X)] = Y;
 	Cycle();
 	HandleFlags(STY);
 }
@@ -827,7 +875,7 @@ void NMOS6502::Opcode0x94() {
 void NMOS6502::Opcode0x95() {
 	u8 ZeroPage = FetchByte();
 	Cycle();
-	Memory[ZeroPage + X] = A;
+	Memory[static_cast<u16>(ZeroPage + X)] = A;
 	Cycle();
 	HandleFlags(STA);
 }
@@ -835,7 +883,7 @@ void NMOS6502::Opcode0x95() {
 void NMOS6502::Opcode0x96() {
 	u8 ZeroPage = FetchByte();
 	Cycle();
-	Memory[ZeroPage + Y] = X;
+	Memory[static_cast<u16>(ZeroPage + Y)] = X;
 	Cycle();
 	HandleFlags(STX);
 }
@@ -984,7 +1032,13 @@ void NMOS6502::Opcode0xAF() {
 }
 
 void NMOS6502::Opcode0xB0() {
-
+	if (ProcessorStatus.test(C) == 1) {
+		Branch(FetchByte());
+	}
+	else {
+		Cycle();
+	}
+	HandleFlags(BCS);
 }
 
 void NMOS6502::Opcode0xB1() {
@@ -1041,7 +1095,7 @@ void NMOS6502::Opcode0xB9() {
 }
 
 void NMOS6502::Opcode0xBA() {
-	X = SP;
+	X = static_cast<u8>(SP);
 	Cycle();
 	HandleFlags(TSX);
 }
@@ -1158,7 +1212,13 @@ void NMOS6502::Opcode0xCF() {
 }
 
 void NMOS6502::Opcode0xD0() {
-
+	if (ProcessorStatus.test(Z) == 0) {
+		Branch(FetchByte());
+	}
+	else {
+		Cycle();
+	}
+	HandleFlags(BNE);
 }
 
 void NMOS6502::Opcode0xD1() {
@@ -1319,7 +1379,13 @@ void NMOS6502::Opcode0xEF() {
 }
 
 void NMOS6502::Opcode0xF0() {
-
+	if (ProcessorStatus.test(Z) == 1) {
+		Branch(FetchByte());
+	}
+	else {
+		Cycle();
+	}
+	HandleFlags(BEQ);
 }
 
 void NMOS6502::Opcode0xF1() {

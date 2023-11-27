@@ -62,6 +62,7 @@ public:
 	u16 GetAbsoluteY(bool CheckBoundary = false);
 	u8 GetZeroPageX();
 	u8 GetZeroPageY();
+	void Branch(u8 Byte);
 
 	void Opcode0x00();
 	void Opcode0x01();
