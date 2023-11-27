@@ -234,7 +234,9 @@ void NMOS6502::Opcode0x17() {
 }
 
 void NMOS6502::Opcode0x18() {
-
+	ProcessorStatus.reset(C);
+	Cycle();
+	HandleFlags(CLC);
 }
 
 void NMOS6502::Opcode0x19() {
@@ -383,7 +385,9 @@ void NMOS6502::Opcode0x37() {
 }
 
 void NMOS6502::Opcode0x38() {
-
+	ProcessorStatus.set(C);
+	Cycle();
+	HandleFlags(SEC);
 }
 
 void NMOS6502::Opcode0x39() {
@@ -534,7 +538,9 @@ void NMOS6502::Opcode0x57() {
 }
 
 void NMOS6502::Opcode0x58() {
-
+	ProcessorStatus.reset(I);
+	Cycle();
+	HandleFlags(CLI);
 }
 
 void NMOS6502::Opcode0x59() {
@@ -668,7 +674,9 @@ void NMOS6502::Opcode0x77() {
 }
 
 void NMOS6502::Opcode0x78() {
-
+	ProcessorStatus.set(I);
+	Cycle();
+	HandleFlags(SEI);
 }
 
 void NMOS6502::Opcode0x79() {
@@ -1020,7 +1028,9 @@ void NMOS6502::Opcode0xB7() {
 }
 
 void NMOS6502::Opcode0xB8() {
-
+	ProcessorStatus.reset(V);
+	Cycle();
+	HandleFlags(CLV);
 }
 
 void NMOS6502::Opcode0xB9() {
@@ -1187,7 +1197,9 @@ void NMOS6502::Opcode0xD7() {
 }
 
 void NMOS6502::Opcode0xD8() {
-
+	ProcessorStatus.reset(D);
+	Cycle();
+	HandleFlags(CLD);
 }
 
 void NMOS6502::Opcode0xD9() {
@@ -1276,7 +1288,7 @@ void NMOS6502::Opcode0xE9() {
 }
 
 void NMOS6502::Opcode0xEA() {
-
+	HandleFlags(NOP);
 }
 
 void NMOS6502::Opcode0xEB() {
@@ -1346,7 +1358,9 @@ void NMOS6502::Opcode0xF7() {
 }
 
 void NMOS6502::Opcode0xF8() {
-
+	ProcessorStatus.set(D);
+	Cycle();
+	HandleFlags(SED);
 }
 
 void NMOS6502::Opcode0xF9() {
