@@ -31,16 +31,15 @@ public:
 	};
 
 	enum FLAGS {
-		C = 0,
-		Z = 1,
-		I = 2,
+		N = 5,
+		V = 4,
 		D = 3,
-		B = 4,
-		V = 5,
-		N = 6
+		I = 2,
+		Z = 1,
+		C = 0
 	};
 
-	std::bitset<7> ProcessorStatus;
+	std::bitset<6> ProcessorStatus;
 	void HandleFlags(INSTRUCTION i);
 
 	void BindOpcodes();

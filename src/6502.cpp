@@ -8,7 +8,7 @@ NMOS6502::NMOS6502() {
 	Y = 0x0;
 	PC = 0xFFFC;
 	SP = 0x0100;
-	ProcessorStatus = std::bitset<7>{0b0000000};
+	ProcessorStatus = std::bitset<6>{0b000000};
 	BindOpcodes();
 }
 
@@ -177,7 +177,12 @@ void NMOS6502::Opcode0x07() {
 }
 
 void NMOS6502::Opcode0x08() {
-
+	u8 P = static_cast<u8>(ProcessorStatus.to_ulong());
+	Cycle();
+	Memory[SP] = P;
+	Cycle();
+	--SP;
+	HandleFlags(PHP);
 }
 
 void NMOS6502::Opcode0x09() {
@@ -336,7 +341,14 @@ void NMOS6502::Opcode0x27() {
 }
 
 void NMOS6502::Opcode0x28() {
-
+	u8 StackP = Memory[SP];
+	Cycle();
+	Memory[SP] = 0x0;
+	Cycle();
+	++SP;
+	ProcessorStatus = std::bitset<6>{StackP};
+	Cycle();
+	HandleFlags(PLP);
 }
 
 void NMOS6502::Opcode0x29() {
@@ -493,7 +505,12 @@ void NMOS6502::Opcode0x47() {
 }
 
 void NMOS6502::Opcode0x48() {
-
+	u8 Accumulator = A;
+	Cycle();
+	Memory[SP] = Accumulator;
+	Cycle();
+	--SP;
+	HandleFlags(PHA);
 }
 
 void NMOS6502::Opcode0x49() {
@@ -642,11 +659,18 @@ void NMOS6502::Opcode0x66() {
 }
 
 void NMOS6502::Opcode0x67() {
-
+		
 }
 
 void NMOS6502::Opcode0x68() {
-
+	u8 StackA = Memory[SP];
+	Cycle();
+	Memory[SP] = 0x0;
+	Cycle();
+	++SP;
+	A = StackA;
+	Cycle();
+	HandleFlags(PLA);
 }
 
 void NMOS6502::Opcode0x69() {
