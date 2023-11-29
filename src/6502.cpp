@@ -116,6 +116,28 @@ u8 NMOS6502::GetZeroPageY() {
 	return EffectiveAddress;
 }
 
+void NMOS6502::Move(u8 *Target, MoveDirection Direction, bool IsRotate) {
+	switch (Direction)
+	{
+	case NMOS6502::LEFT:
+		*Target & 0x80 ? ProcessorStatus.set(C) : ProcessorStatus.reset(C);
+		Cycle();
+		*Target <<= 1;
+		Cycle();
+		if (ProcessorStatus[C] && IsRotate) *Target |= 0x01;
+		break;
+	case NMOS6502::RIGHT:
+		*Target & 0x01 ? ProcessorStatus.set(C) : ProcessorStatus.reset(C);
+		Cycle();
+		*Target >>= 1;
+		Cycle();
+		if (ProcessorStatus[C] && IsRotate) *Target |= 0x80;
+		break;
+	default:
+		break;
+	}
+}
+
 void NMOS6502::Cycle() {
 	++CyclesPerformed;
 }
@@ -169,7 +191,10 @@ void NMOS6502::Opcode0x05() {
 }
 
 void NMOS6502::Opcode0x06() {
-
+	u8 ZeroPage = FetchByte();
+	Move(&Memory[ZeroPage], LEFT, false);
+	Cycle();
+	HandleFlags(ASL);
 }
 
 void NMOS6502::Opcode0x07() {
@@ -192,7 +217,10 @@ void NMOS6502::Opcode0x09() {
 }
 
 void NMOS6502::Opcode0x0A() {
-
+	A& (1 << 7) ? ProcessorStatus.set(C) : ProcessorStatus.reset(C);
+	A <<= 1;
+	Cycle();
+	HandleFlags(ASL);
 }
 
 void NMOS6502::Opcode0x0B() {
@@ -211,7 +239,10 @@ void NMOS6502::Opcode0x0D() {
 }
 
 void NMOS6502::Opcode0x0E() {
-
+	u16 EffectiveAddress = FetchWord();
+	Move(&Memory[EffectiveAddress], LEFT, false);
+	Cycle();
+	HandleFlags(ASL);
 }
 
 void NMOS6502::Opcode0x0F() {
@@ -255,7 +286,12 @@ void NMOS6502::Opcode0x15() {
 }
 
 void NMOS6502::Opcode0x16() {
-
+	u8 ZeroPage = FetchByte();
+	u8 EffectiveAddress = ZeroPage + X;
+	Cycle();
+	Move(&Memory[EffectiveAddress], LEFT, false);
+	Cycle();
+	HandleFlags(ASL);
 }
 
 void NMOS6502::Opcode0x17() {
@@ -295,7 +331,12 @@ void NMOS6502::Opcode0x1D() {
 }
 
 void NMOS6502::Opcode0x1E() {
-
+	u16 BaseAddress = FetchWord();
+	u16 EffectiveAddress = BaseAddress + X;
+	Cycle();
+	Move(&Memory[EffectiveAddress], LEFT, false);
+	Cycle();
+	HandleFlags(ASL);
 }
 
 void NMOS6502::Opcode0x1F() {
@@ -333,7 +374,10 @@ void NMOS6502::Opcode0x25() {
 }
 
 void NMOS6502::Opcode0x26() {
-
+	u8 ZeroPage = FetchByte();
+	Move(&Memory[ZeroPage], LEFT, true);
+	Cycle();
+	HandleFlags(ROL);
 }
 
 void NMOS6502::Opcode0x27() {
@@ -357,7 +401,10 @@ void NMOS6502::Opcode0x29() {
 }
 
 void NMOS6502::Opcode0x2A() {
-
+	A& (1 << 7) ? ProcessorStatus.set(C) : ProcessorStatus.reset(C);
+	A = (A << 1) | (A >> 7);
+	Cycle();
+	HandleFlags(ROL);
 }
 
 void NMOS6502::Opcode0x2B() {
@@ -376,7 +423,10 @@ void NMOS6502::Opcode0x2D() {
 }
 
 void NMOS6502::Opcode0x2E() {
-
+	u16 EffectiveAddress = FetchWord();
+	Move(&Memory[EffectiveAddress], LEFT, true);
+	Cycle();
+	HandleFlags(ROL);
 }
 
 void NMOS6502::Opcode0x2F() {
@@ -419,7 +469,12 @@ void NMOS6502::Opcode0x35() {
 }
 
 void NMOS6502::Opcode0x36() {
-
+	u8 BaseAddress = FetchByte();
+	u8 EffectiveAddress = BaseAddress + X;
+	Cycle();
+	Move(&Memory[EffectiveAddress], LEFT, true);
+	Cycle();
+	HandleFlags(ROL);
 }
 
 void NMOS6502::Opcode0x37() {
@@ -459,7 +514,12 @@ void NMOS6502::Opcode0x3D() {
 }
 
 void NMOS6502::Opcode0x3E() {
-
+	u16 BaseAddress = FetchWord();
+	u16 EffectiveAddress = BaseAddress + X;
+	Cycle();
+	Move(&Memory[EffectiveAddress], LEFT, true);
+	Cycle();
+	HandleFlags(ROL);
 }
 
 void NMOS6502::Opcode0x3F() {
@@ -497,7 +557,10 @@ void NMOS6502::Opcode0x45() {
 }
 
 void NMOS6502::Opcode0x46() {
-
+	u8 ZeroPage = FetchByte();
+	Move(&Memory[ZeroPage], RIGHT, false);
+	Cycle();
+	HandleFlags(LSR);
 }
 
 void NMOS6502::Opcode0x47() {
@@ -520,7 +583,10 @@ void NMOS6502::Opcode0x49() {
 }
 
 void NMOS6502::Opcode0x4A() {
-
+	A& (1 << 1) ? ProcessorStatus.set(C) : ProcessorStatus.reset(C);
+	A >>= 1;
+	Cycle();
+	HandleFlags(LSR);
 }
 
 void NMOS6502::Opcode0x4B() {
@@ -539,7 +605,10 @@ void NMOS6502::Opcode0x4D() {
 }
 
 void NMOS6502::Opcode0x4E() {
-
+	u16 EffectiveAddress = FetchWord();
+	Move(&Memory[EffectiveAddress], RIGHT, false);
+	Cycle();
+	HandleFlags(LSR);
 }
 
 void NMOS6502::Opcode0x4F() {
@@ -583,7 +652,12 @@ void NMOS6502::Opcode0x55() {
 }
 
 void NMOS6502::Opcode0x56() {
-
+	u8 BaseAddress = FetchByte();
+	u8 EffectiveAddress = BaseAddress + X;
+	Cycle();
+	Move(&Memory[EffectiveAddress], RIGHT, false);
+	Cycle();
+	HandleFlags(LSR);
 }
 
 void NMOS6502::Opcode0x57() {
@@ -623,7 +697,12 @@ void NMOS6502::Opcode0x5D() {
 }
 
 void NMOS6502::Opcode0x5E() {
-
+	u16 BaseAddress = FetchWord();
+	u16 EffectiveAddress = BaseAddress + X;
+	Cycle();
+	Move(&Memory[EffectiveAddress], RIGHT, false);
+	Cycle();
+	HandleFlags(LSR);
 }
 
 void NMOS6502::Opcode0x5F() {
@@ -655,7 +734,10 @@ void NMOS6502::Opcode0x65() {
 }
 
 void NMOS6502::Opcode0x66() {
-
+	u8 ZeroPage = FetchByte();
+	Move(&Memory[ZeroPage], RIGHT, true);
+	Cycle();
+	HandleFlags(ROR);
 }
 
 void NMOS6502::Opcode0x67() {
@@ -678,7 +760,10 @@ void NMOS6502::Opcode0x69() {
 }
 
 void NMOS6502::Opcode0x6A() {
-
+	A& (1 << 7) ? ProcessorStatus.set(C) : ProcessorStatus.reset(C);
+	A = (A >> 1) | (A << 7);
+	Cycle();
+	HandleFlags(ROR);
 }
 
 void NMOS6502::Opcode0x6B() {
@@ -694,7 +779,10 @@ void NMOS6502::Opcode0x6D() {
 }
 
 void NMOS6502::Opcode0x6E() {
-
+	u16 EffectiveAddress = FetchWord();
+	Move(&Memory[EffectiveAddress], RIGHT, true);
+	Cycle();
+	HandleFlags(ROR);
 }
 
 void NMOS6502::Opcode0x6F() {
@@ -732,7 +820,12 @@ void NMOS6502::Opcode0x75() {
 }
 
 void NMOS6502::Opcode0x76() {
-
+	u8 BaseAddress = FetchByte();
+	u8 EffectiveAddress = BaseAddress + X;
+	Cycle();
+	Move(&Memory[EffectiveAddress], RIGHT, true);
+	Cycle();
+	HandleFlags(ROR);
 }
 
 void NMOS6502::Opcode0x77() {
@@ -766,7 +859,12 @@ void NMOS6502::Opcode0x7D() {
 }
 
 void NMOS6502::Opcode0x7E() {
-
+	u16 BaseAddress = FetchWord();
+	u16 EffectiveAddress = BaseAddress + X;
+	Cycle();
+	Move(&Memory[EffectiveAddress], RIGHT, true);
+	Cycle();
+	HandleFlags(ROR);
 }
 
 void NMOS6502::Opcode0x7F() {

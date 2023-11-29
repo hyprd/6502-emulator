@@ -61,6 +61,10 @@ public:
 	u16 GetAbsoluteY(bool CheckBoundary = false);
 	u8 GetZeroPageX();
 	u8 GetZeroPageY();
+
+	enum MoveDirection {LEFT, RIGHT};
+	void Move(u8* Target, MoveDirection Direction, bool IsRotate = false);
+
 	void Branch(u8 Byte);
 
 	void Opcode0x00();
