@@ -61,7 +61,7 @@ public:
 	u16 GetAbsoluteY(bool CheckBoundary = false);
 	u8 GetZeroPageX();
 	u8 GetZeroPageY();
-	void PerformADC(u8 Operand);
+	void PerformArithmetic(u8 Operand, bool Subtraction = false);
 
 	enum MoveDirection {LEFT, RIGHT};
 	void Move(u8* Target, MoveDirection Direction, bool IsRotate = false);

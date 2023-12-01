@@ -116,8 +116,8 @@ u8 NMOS6502::GetZeroPageY() {
 	return EffectiveAddress;
 }
 
-void NMOS6502::PerformADC(u8 Operand) {
-	auto Evaluation = A + Operand + ProcessorStatus[C];
+void NMOS6502::PerformArithmetic(u8 Operand, bool Subtraction) {
+	auto Evaluation = A + Operand + (Subtraction ? ~ProcessorStatus[C] : ProcessorStatus[C]);
 	A = static_cast<u8>(Evaluation);
 }
 
@@ -720,7 +720,7 @@ void NMOS6502::Opcode0x60() {
 
 void NMOS6502::Opcode0x61() {
 	u16 EffectiveAddress = GetIndirectX();
-	PerformADC(Memory[EffectiveAddress]);
+	PerformArithmetic(Memory[EffectiveAddress]);
 	Cycle();
 	HandleFlags(INSTRUCTION::ADC);
 }
@@ -739,7 +739,7 @@ void NMOS6502::Opcode0x64() {
 
 void NMOS6502::Opcode0x65() {
 	u8 ZeroPage = FetchByte();
-	PerformADC(Memory[ZeroPage]);
+	PerformArithmetic(Memory[ZeroPage]);
 	Cycle();
 	HandleFlags(INSTRUCTION::ADC);
 }
@@ -768,7 +768,7 @@ void NMOS6502::Opcode0x68() {
 
 void NMOS6502::Opcode0x69() {
 	u8 Immediate = FetchByte();
-	PerformADC(Immediate);
+	PerformArithmetic(Immediate);
 	HandleFlags(INSTRUCTION::ADC);
 }
 
@@ -789,7 +789,7 @@ void NMOS6502::Opcode0x6C() {
 
 void NMOS6502::Opcode0x6D() {
 	u16 EffectiveAddress = FetchWord();
-	PerformADC(Memory[EffectiveAddress]);
+	PerformArithmetic(Memory[EffectiveAddress]);
 	Cycle();
 	HandleFlags(INSTRUCTION::ADC);
 }
@@ -817,7 +817,7 @@ void NMOS6502::Opcode0x70() {
 
 void NMOS6502::Opcode0x71() {
 	u16 EffectiveAddress = GetIndirectY(true);
-	PerformADC(Memory[EffectiveAddress]);
+	PerformArithmetic(Memory[EffectiveAddress]);
 	Cycle();
 	HandleFlags(INSTRUCTION::ADC);
 }
@@ -838,7 +838,7 @@ void NMOS6502::Opcode0x75() {
 	u8 ZeroPage = FetchByte();
 	u8 EffectiveAddress = ZeroPage + X;
 	Cycle();
-	PerformADC(Memory[EffectiveAddress]);
+	PerformArithmetic(Memory[EffectiveAddress]);
 	Cycle();
 	HandleFlags(INSTRUCTION::ADC);
 }
@@ -864,7 +864,7 @@ void NMOS6502::Opcode0x78() {
 
 void NMOS6502::Opcode0x79() {
 	u16 EffectiveAddress = GetAbsoluteY(true);
-	PerformADC(Memory[EffectiveAddress]);
+	PerformArithmetic(Memory[EffectiveAddress]);
 	Cycle();
 	HandleFlags(INSTRUCTION::ADC);
 }
@@ -883,7 +883,7 @@ void NMOS6502::Opcode0x7C() {
 
 void NMOS6502::Opcode0x7D() {
 	u16 EffectiveAddress = GetAbsoluteX(true);
-	PerformADC(Memory[EffectiveAddress]);
+	PerformArithmetic(Memory[EffectiveAddress]);
 	Cycle();
 	HandleFlags(INSTRUCTION::ADC);
 }
@@ -1455,7 +1455,10 @@ void NMOS6502::Opcode0xE0() {
 }
 
 void NMOS6502::Opcode0xE1() {
-
+	u16 EffectiveAddress = GetIndirectX();
+	PerformArithmetic(~Memory[EffectiveAddress], true);
+	Cycle();
+	HandleFlags(INSTRUCTION::SBC);
 }
 
 void NMOS6502::Opcode0xE2() {
@@ -1471,7 +1474,10 @@ void NMOS6502::Opcode0xE4() {
 }
 
 void NMOS6502::Opcode0xE5() {
-
+	u8 ZeroPage = FetchByte();
+	PerformArithmetic(~Memory[ZeroPage], true);
+	Cycle();
+	HandleFlags(INSTRUCTION::SBC);
 }
 
 void NMOS6502::Opcode0xE6() {
@@ -1497,7 +1503,7 @@ void NMOS6502::Opcode0xE8() {
 
 void NMOS6502::Opcode0xE9() {
 	u8 Immediate = FetchByte();
-	PerformADC(~Immediate);
+	PerformArithmetic(~Immediate, true);
 	HandleFlags(INSTRUCTION::SBC);
 }
 
@@ -1514,7 +1520,10 @@ void NMOS6502::Opcode0xEC() {
 }
 
 void NMOS6502::Opcode0xED() {
-
+	u16 EffectiveAddress = FetchWord();
+	PerformArithmetic(~Memory[EffectiveAddress], true);
+	Cycle();
+	HandleFlags(INSTRUCTION::SBC);
 }
 
 void NMOS6502::Opcode0xEE() {
@@ -1543,7 +1552,10 @@ void NMOS6502::Opcode0xF0() {
 }
 
 void NMOS6502::Opcode0xF1() {
-
+	u16 EffectiveAddress = GetIndirectY(true);
+	PerformArithmetic(~Memory[EffectiveAddress], true);
+	Cycle();
+	HandleFlags(INSTRUCTION::SBC);
 }
 
 void NMOS6502::Opcode0xF2() {
@@ -1559,7 +1571,12 @@ void NMOS6502::Opcode0xF4() {
 }
 
 void NMOS6502::Opcode0xF5() {
-
+	u8 ZeroPage = FetchByte();
+	u8 EffectiveAddress = ZeroPage + X;
+	Cycle();
+	PerformArithmetic(~Memory[EffectiveAddress], true);
+	Cycle();
+	HandleFlags(INSTRUCTION::SBC);
 }
 
 void NMOS6502::Opcode0xF6() {
@@ -1584,7 +1601,10 @@ void NMOS6502::Opcode0xF8() {
 }
 
 void NMOS6502::Opcode0xF9() {
-
+	u16 EffectiveAddress = GetAbsoluteY(true);
+	PerformArithmetic(~Memory[EffectiveAddress], true);
+	Cycle();
+	HandleFlags(INSTRUCTION::SBC);
 }
 
 void NMOS6502::Opcode0xFA() {
@@ -1600,7 +1620,10 @@ void NMOS6502::Opcode0xFC() {
 }
 
 void NMOS6502::Opcode0xFD() {
-
+	u16 EffectiveAddress = GetAbsoluteX(true);
+	PerformArithmetic(~Memory[EffectiveAddress], true);
+	Cycle();
+	HandleFlags(INSTRUCTION::SBC);
 }
 
 void NMOS6502::Opcode0xFE() {

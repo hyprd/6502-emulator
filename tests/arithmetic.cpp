@@ -16,11 +16,10 @@ public:
 	virtual void TearDown() {
 	}
 
-	void TestArithmetic(u8 Operand, u8 Target) {
-		M6502.A = 0x00;
+	void TestArithmetic(u8 Operand, u8 Target, bool Subtraction) {
+		M6502.A = Subtraction ? 0x00 : 0x00;
 		M6502.ProcessorStatus.set(M6502.C);
 		CyclesRan = M6502.Execute(InstructionCycles);
-		
 		ASSERT_EQ(M6502.A, Target);
 	}
 };
@@ -30,7 +29,7 @@ TEST_F(M6502ArithmeticTestSuite, ADC_IMM) {
 	M6502.Memory[0xFFFC] = 0x69;
 
 	M6502.Memory[0xFFFD] = 0x42;
-	TestArithmetic(M6502.A, 0x43);
+	TestArithmetic(M6502.A, 0x43, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
@@ -40,7 +39,7 @@ TEST_F(M6502ArithmeticTestSuite, ADC_ZP) {
 
 	M6502.Memory[0xFFFD] = 0x42;
 	M6502.Memory[0x42] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
@@ -51,7 +50,7 @@ TEST_F(M6502ArithmeticTestSuite, ADC_ZP_X) {
 	M6502.Memory[0xFFFD] = 0x42;
 	M6502.X = 0x01;
 	M6502.Memory[0x43] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
@@ -62,7 +61,7 @@ TEST_F(M6502ArithmeticTestSuite, ADC_ABS) {
 	M6502.Memory[0xFFFD] = 0xAB;
 	M6502.Memory[0xFFFE] = 0xAB;
 	M6502.Memory[0xABAB] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
@@ -76,14 +75,14 @@ TEST_F(M6502ArithmeticTestSuite, ADC_ABS_X) {
 	M6502.Memory[0xFFFD] = 0xA0;
 	M6502.Memory[0xFFFE] = 0xFF;
 	M6502.Memory[0xA100] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 
 	/* Page boundary not crossed */
 	M6502.PC = 0xFFFC;
 	M6502.Memory[0xFFFE] = 0xFE;
 	M6502.Memory[0xA0FF] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
 
@@ -97,14 +96,14 @@ TEST_F(M6502ArithmeticTestSuite, ADC_ABS_Y) {
 	M6502.Memory[0xFFFD] = 0xA0;
 	M6502.Memory[0xFFFE] = 0xFF;
 	M6502.Memory[0xA100] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 
 	/* Page boundary not crossed */
 	M6502.PC = 0xFFFC;
 	M6502.Memory[0xFFFE] = 0xFE;
 	M6502.Memory[0xA0FF] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
 
@@ -118,7 +117,7 @@ TEST_F(M6502ArithmeticTestSuite, ADC_IND_X) {
 	M6502.Memory[0x43] = 0xC0;
 	M6502.Memory[0x44] = 0xC2;
 	M6502.Memory[0xC2C0] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 }
 
@@ -132,13 +131,131 @@ TEST_F(M6502ArithmeticTestSuite, ADC_IND_Y) {
 	M6502.Memory[0x42] = 0xFF;
 	M6502.Memory[0x43] = 0xA2;
 	M6502.Memory[0xA300] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
 	ASSERT_EQ(CyclesRan, InstructionCycles);
 
 	/* Page boundary not crossed */
 	M6502.PC = 0xFFFC;
 	M6502.Memory[0x42] = 0xF0;
 	M6502.Memory[0xA2F1] = 0xB3;
-	TestArithmetic(M6502.A, 0xB4);
+	TestArithmetic(M6502.A, 0xB4, false);
+	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
+}
+
+TEST_F(M6502ArithmeticTestSuite, SBC_IMM) {
+	InstructionCycles = 2;
+	M6502.Memory[0xFFFC] = 0xE9;
+
+	M6502.Memory[0xFFFD] = 0x42;
+	TestArithmetic(M6502.A, 0xBD, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502ArithmeticTestSuite, SBC_ZP) {
+	InstructionCycles = 3;
+	M6502.Memory[0xFFFC] = 0xE5;
+
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Memory[0x42] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502ArithmeticTestSuite, SBC_ZP_X) {
+	InstructionCycles = 4;
+	M6502.Memory[0xFFFC] = 0xF5;
+
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.X = 0x01;
+	M6502.Memory[0x43] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502ArithmeticTestSuite, SBC_ABS) {
+	InstructionCycles = 4;
+	M6502.Memory[0xFFFC] = 0xED;
+
+	M6502.Memory[0xFFFD] = 0xAB;
+	M6502.Memory[0xFFFE] = 0xAB;
+	M6502.Memory[0xABAB] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502ArithmeticTestSuite, SBC_ABS_X) {
+	InstructionCycles = 5;
+	M6502.Memory[0xFFFC] = 0xFD;
+
+	M6502.X = 0x01;
+
+	/* Page boundary crossed */
+	M6502.Memory[0xFFFD] = 0xA0;
+	M6502.Memory[0xFFFE] = 0xFF;
+	M6502.Memory[0xA100] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+
+	/* Page boundary not crossed */
+	M6502.PC = 0xFFFC;
+	M6502.Memory[0xFFFE] = 0xFE;
+	M6502.Memory[0xA0FF] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
+}
+
+TEST_F(M6502ArithmeticTestSuite, SBC_ABS_Y) {
+	InstructionCycles = 5;
+	M6502.Memory[0xFFFC] = 0xF9;
+
+	M6502.Y = 0x01;
+
+	/* Page boundary crossed */
+	M6502.Memory[0xFFFD] = 0xA0;
+	M6502.Memory[0xFFFE] = 0xFF;
+	M6502.Memory[0xA100] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+
+	/* Page boundary not crossed */
+	M6502.PC = 0xFFFC;
+	M6502.Memory[0xFFFE] = 0xFE;
+	M6502.Memory[0xA0FF] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
+}
+
+TEST_F(M6502ArithmeticTestSuite, SBC_IND_X) {
+	InstructionCycles = 6;
+	M6502.Memory[0xFFFC] = 0xE1;
+	
+	M6502.X = 0x01;
+
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Memory[0x43] = 0xC0;
+	M6502.Memory[0x44] = 0xC2;
+	M6502.Memory[0xC2C0] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+}
+
+TEST_F(M6502ArithmeticTestSuite, SBC_IND_Y) {
+	InstructionCycles = 6;
+	M6502.Memory[0xFFFC] = 0xF1;
+
+	/* Page boundary crossed */
+	M6502.Memory[0xFFFD] = 0x42;
+	M6502.Y = 0x01;
+	M6502.Memory[0x42] = 0xFF;
+	M6502.Memory[0x43] = 0xA2;
+	M6502.Memory[0xA300] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
+	ASSERT_EQ(CyclesRan, InstructionCycles);
+
+	/* Page boundary not crossed */
+	M6502.PC = 0xFFFC;
+	M6502.Memory[0x42] = 0xF0;
+	M6502.Memory[0xA2F1] = 0xB3;
+	TestArithmetic(M6502.A, 0x4C, true);
 	ASSERT_EQ(CyclesRan, InstructionCycles - 1);
 }
