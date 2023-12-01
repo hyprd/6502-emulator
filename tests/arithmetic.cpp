@@ -81,7 +81,6 @@ TEST_F(M6502ArithmeticTestSuite, ADC_ABS_X) {
 
 	/* Page boundary not crossed */
 	M6502.PC = 0xFFFC;
-	M6502.A = 0x00;
 	M6502.Memory[0xFFFE] = 0xFE;
 	M6502.Memory[0xA0FF] = 0xB3;
 	TestArithmetic(M6502.A, 0xB4);
@@ -103,7 +102,6 @@ TEST_F(M6502ArithmeticTestSuite, ADC_ABS_Y) {
 
 	/* Page boundary not crossed */
 	M6502.PC = 0xFFFC;
-	M6502.A = 0x00;
 	M6502.Memory[0xFFFE] = 0xFE;
 	M6502.Memory[0xA0FF] = 0xB3;
 	TestArithmetic(M6502.A, 0xB4);
@@ -139,7 +137,6 @@ TEST_F(M6502ArithmeticTestSuite, ADC_IND_Y) {
 
 	/* Page boundary not crossed */
 	M6502.PC = 0xFFFC;
-	M6502.A = 0x00;
 	M6502.Memory[0x42] = 0xF0;
 	M6502.Memory[0xA2F1] = 0xB3;
 	TestArithmetic(M6502.A, 0xB4);
