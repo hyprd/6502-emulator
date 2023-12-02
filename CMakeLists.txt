@@ -7,7 +7,7 @@ endif()
 
 project ("6502-emulator")
 set(SOURCES "tests/transfer.cpp" "tests/increment_decrement.cpp" "tests/logic.cpp" "src/6502.cpp" "tests/flags.cpp")
-add_executable (6502-emulator ${SOURCES} "tests/branch.cpp" "tests/stack.cpp" "tests/shift.cpp" "tests/arithmetic.cpp")
+add_executable (6502-emulator ${SOURCES} "tests/branch.cpp" "tests/stack.cpp" "tests/shift.cpp" "tests/arithmetic.cpp" "tests/compare.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 6502-emulator PROPERTY CXX_STANDARD 20)

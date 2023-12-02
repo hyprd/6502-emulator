@@ -62,6 +62,7 @@ public:
 	u8 GetZeroPageX();
 	u8 GetZeroPageY();
 	void PerformArithmetic(u8 Operand, bool Subtraction = false);
+	void Compare(u8 *Register, u8 Operand);
 
 	enum MoveDirection {LEFT, RIGHT};
 	void Move(u8* Target, MoveDirection Direction, bool IsRotate = false);

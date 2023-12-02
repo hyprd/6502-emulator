@@ -121,6 +121,13 @@ void NMOS6502::PerformArithmetic(u8 Operand, bool Subtraction) {
 	A = static_cast<u8>(Evaluation);
 }
 
+void NMOS6502::Compare(u8 *Register, u8 Operand) {
+	int16_t Evaluation = *Register - Operand; 
+	ProcessorStatus[N] = (Evaluation == 0) ? 0 : (Evaluation & (1 << 7));
+	ProcessorStatus[Z] = (Evaluation == 0) ? 1 : 0;
+	ProcessorStatus[C] = (*Register < Operand) ? 0 : 1;
+}
+
 void NMOS6502::Move(u8 *Target, MoveDirection Direction, bool IsRotate) {
 	switch (Direction)
 	{
@@ -1282,11 +1289,14 @@ void NMOS6502::Opcode0xBF() {
 }
 
 void NMOS6502::Opcode0xC0() {
-
+	u8 Immediate = FetchByte();
+	Compare(&Y, Immediate);
 }
 
 void NMOS6502::Opcode0xC1() {
-
+	u16 EffectiveAddress = GetIndirectX();
+	Compare(&A, Memory[EffectiveAddress]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xC2() {
@@ -1298,11 +1308,15 @@ void NMOS6502::Opcode0xC3() {
 }
 
 void NMOS6502::Opcode0xC4() {
-
+	u8 ZeroPage = FetchByte();
+	Compare(&Y, Memory[ZeroPage]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xC5() {
-
+	u8 ZeroPage = FetchByte();
+	Compare(&A, Memory[ZeroPage]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xC6() {
@@ -1327,7 +1341,8 @@ void NMOS6502::Opcode0xC8() {
 }
 
 void NMOS6502::Opcode0xC9() {
-
+	u8 Immediate = FetchByte();
+	Compare(&A, Immediate);
 }
 
 void NMOS6502::Opcode0xCA() {
@@ -1341,11 +1356,15 @@ void NMOS6502::Opcode0xCB() {
 }
 
 void NMOS6502::Opcode0xCC() {
-
+	u16 EffectiveAddress = FetchWord();
+	Compare(&Y, Memory[EffectiveAddress]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xCD() {
-
+	u16 EffectiveAddress = FetchWord();
+	Compare(&A, Memory[EffectiveAddress]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xCE() {
@@ -1374,7 +1393,9 @@ void NMOS6502::Opcode0xD0() {
 }
 
 void NMOS6502::Opcode0xD1() {
-
+	u16 EffectiveAddress = GetIndirectY(true);
+	Compare(&A, Memory[EffectiveAddress]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xD2() {
@@ -1390,7 +1411,11 @@ void NMOS6502::Opcode0xD4() {
 }
 
 void NMOS6502::Opcode0xD5() {
-
+	u8 ZeroPage = FetchByte();
+	ZeroPage += X;
+	Cycle();
+	Compare(&A, Memory[ZeroPage]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xD6() {
@@ -1415,7 +1440,9 @@ void NMOS6502::Opcode0xD8() {
 }
 
 void NMOS6502::Opcode0xD9() {
-
+	u16 EffectiveAddress = GetAbsoluteY(true);
+	Compare(&A, Memory[EffectiveAddress]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xDA() {
@@ -1431,7 +1458,9 @@ void NMOS6502::Opcode0xDC() {
 }
 
 void NMOS6502::Opcode0xDD() {
-
+	u16 EffectiveAddress = GetAbsoluteX(true);
+	Compare(&A, Memory[EffectiveAddress]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xDE() {
@@ -1451,7 +1480,8 @@ void NMOS6502::Opcode0xDF() {
 }
 
 void NMOS6502::Opcode0xE0() {
-
+	u8 Immediate = FetchByte();
+	Compare(&X, Immediate);
 }
 
 void NMOS6502::Opcode0xE1() {
@@ -1470,7 +1500,9 @@ void NMOS6502::Opcode0xE3() {
 }
 
 void NMOS6502::Opcode0xE4() {
-
+	u8 ZeroPage = FetchByte();
+	Compare(&X, Memory[ZeroPage]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xE5() {
@@ -1516,7 +1548,9 @@ void NMOS6502::Opcode0xEB() {
 }
 
 void NMOS6502::Opcode0xEC() {
-
+	u16 EffectiveAddress = FetchWord();
+	Compare(&X, Memory[EffectiveAddress]);
+	Cycle();
 }
 
 void NMOS6502::Opcode0xED() {
