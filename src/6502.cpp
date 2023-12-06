@@ -128,6 +128,10 @@ void NMOS6502::Compare(u8 *Register, u8 Operand) {
 	ProcessorStatus[C] = (*Register < Operand) ? 0 : 1;
 }
 
+void NMOS6502::Cycle() {
+	++CyclesPerformed;
+}
+
 void NMOS6502::Move(u8 *Target, MoveDirection Direction, bool IsRotate) {
 	switch (Direction)
 	{
@@ -150,14 +154,10 @@ void NMOS6502::Move(u8 *Target, MoveDirection Direction, bool IsRotate) {
 	}
 }
 
-void NMOS6502::Cycle() {
-	++CyclesPerformed;
-}
-
 void NMOS6502::Branch(u8 Byte) {
 	PC -= 2; // Execute, FetchByte ops execute before running this function
 	if (Byte > 0x7F) {
-		uint8_t BranchOffset = pow(2, 8) - Byte;
+		u8 BranchOffset = static_cast<u8>(pow(2, 8) - Byte);
 		if ((PC & 0xFF00) != ((PC - BranchOffset) & 0xFF00)) {
 			Cycle();
 		}
@@ -356,7 +356,16 @@ void NMOS6502::Opcode0x1F() {
 }
 
 void NMOS6502::Opcode0x20() {
-
+	Memory[SP] = ((PC - 1) >> 8) & 0xFF; // High return
+	Cycle();
+	--SP;
+	Memory[SP] = (PC - 1) & 0xFF; // Low return
+	Cycle();
+	--SP;
+	PC = (Memory[PC + 2] << 8) | (Memory[PC + 1]);
+	Cycle();
+	Cycle();
+	Cycle();
 }
 
 void NMOS6502::Opcode0x21() {
@@ -606,7 +615,11 @@ void NMOS6502::Opcode0x4B() {
 }
 
 void NMOS6502::Opcode0x4C() {
-
+	u16 Low = Memory[PC];
+	Cycle();
+	u16 High = Memory[static_cast<u16>(PC + 1)];
+	Cycle();
+	PC = High << 8 | Low;
 }
 
 void NMOS6502::Opcode0x4D() {
@@ -722,7 +735,15 @@ void NMOS6502::Opcode0x5F() {
 }
 
 void NMOS6502::Opcode0x60() {
-
+	u8 PCReturnLow = Memory[SP + 1];
+	Cycle();
+	++SP;
+	u8 PCReturnHigh = Memory[SP + 1];
+	Cycle();
+	++SP;
+	Cycle();
+	Cycle();
+	PC = (PCReturnHigh << 8 | PCReturnLow) + 1; // auto-increments
 }
 
 void NMOS6502::Opcode0x61() {
@@ -791,7 +812,16 @@ void NMOS6502::Opcode0x6B() {
 }
 
 void NMOS6502::Opcode0x6C() {
-
+	u16 Low = Memory[PC];
+	Cycle();
+	u16 High = Memory[PC + 1];
+	Cycle();
+	u16 BaseAddress = High << 8 | Low;
+	u16 EffectiveAddressLow = Memory[BaseAddress];
+	Cycle();
+	u16 EffectiveAddressHigh = Memory[static_cast<u16>(BaseAddress + 1)];
+	Cycle();
+	PC = EffectiveAddressLow << 8 | EffectiveAddressHigh;
 }
 
 void NMOS6502::Opcode0x6D() {

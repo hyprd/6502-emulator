@@ -66,7 +66,6 @@ public:
 
 	enum MoveDirection {LEFT, RIGHT};
 	void Move(u8* Target, MoveDirection Direction, bool IsRotate = false);
-
 	void Branch(u8 Byte);
 
 	void Opcode0x00();
