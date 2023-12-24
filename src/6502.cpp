@@ -384,7 +384,11 @@ void NMOS6502::Opcode0x23() {
 }
 
 void NMOS6502::Opcode0x24() {
-
+	u8 ZeroPage = FetchByte();
+	u8 Operand = Memory[ZeroPage];
+	(A & Operand) == 0 ? ProcessorStatus.set(Z) : ProcessorStatus.reset(Z);
+	(Operand & (1 << 6)) == 1 ? ProcessorStatus.set(N) : ProcessorStatus.reset(N);
+	(Operand & (1 << 7)) == 1 ? ProcessorStatus.set(V) : ProcessorStatus.reset(V);
 }
 
 void NMOS6502::Opcode0x25() {
@@ -433,7 +437,11 @@ void NMOS6502::Opcode0x2B() {
 }
 
 void NMOS6502::Opcode0x2C() {
-
+	u16 EffectiveAddress = FetchWord();
+	u8 Operand = Memory[EffectiveAddress];
+	(A & Operand) == 0 ? ProcessorStatus.set(Z) : ProcessorStatus.reset(Z);
+	(Operand & (1 << 6)) == 1 ? ProcessorStatus.set(N) : ProcessorStatus.reset(N);
+	(Operand & (1 << 7)) == 1 ? ProcessorStatus.set(V) : ProcessorStatus.reset(V);
 }
 
 void NMOS6502::Opcode0x2D() {
