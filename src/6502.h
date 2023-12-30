@@ -41,6 +41,8 @@ public:
 
 	std::bitset<6> ProcessorStatus;
 	void HandleFlags(INSTRUCTION i);
+	void IRQ();
+	void NMI();
 
 	void BindOpcodes();
 	void Reset();

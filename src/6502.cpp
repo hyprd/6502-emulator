@@ -45,6 +45,31 @@ void NMOS6502::HandleFlags(INSTRUCTION i) {
 	}
 }
 
+void NMOS6502::IRQ() {
+	if (ProcessorStatus[I] == 1) { // Maskable interrupts are disabled
+		return;
+	}
+	/* Push PC to stack (hh first) */
+	Memory[SP] = PC << 8;
+	--SP;
+	Memory[SP] = PC & 0xFF;
+	--SP;
+	/* Set processor flags and push to stack */
+	Memory[SP] = static_cast<uint8_t>(ProcessorStatus.to_ulong());
+	PC = Memory[0xFFFA];
+}
+
+void NMOS6502::NMI() {
+	/* Push PC to stack (hh first) */
+	Memory[SP] = PC << 8;
+	--SP;
+	Memory[SP] = PC & 0xFF;
+	--SP;
+	/* Set processor flags and push to stack */
+	Memory[SP] = static_cast<uint8_t>(ProcessorStatus.to_ulong());
+	PC = Memory[0xFFFE];
+}
+
 int NMOS6502::Execute(u32 CyclesRequired) {
 	CyclesPerformed = 0;
 	u8 Instruction = FetchByte();
@@ -138,7 +163,7 @@ void NMOS6502::Move(u8 *Target, MoveDirection Direction, bool IsRotate) {
 	case NMOS6502::LEFT:
 		*Target & 0x80 ? ProcessorStatus.set(C) : ProcessorStatus.reset(C);
 		Cycle();
-		*Target <<= 1;
+		*Target <<= 1;	
 		Cycle();
 		if (ProcessorStatus[C] && IsRotate) *Target |= 0x01;
 		break;
@@ -556,7 +581,10 @@ void NMOS6502::Opcode0x3F() {
 }
 
 void NMOS6502::Opcode0x40() {
-
+	ProcessorStatus = Memory[SP];
+	++SP;
+	PC = Memory[static_cast<uint16_t>(SP + 1)] << 8 + Memory[SP];
+	SP += 2;
 }
 
 void NMOS6502::Opcode0x41() {
