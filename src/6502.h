@@ -41,6 +41,9 @@ public:
 
 	std::bitset<6> ProcessorStatus;
 	void HandleFlags(INSTRUCTION i);
+
+	bool NMIPending;
+	bool IRQPending;
 	void IRQ();
 	void NMI();
 

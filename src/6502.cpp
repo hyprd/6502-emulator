@@ -10,6 +10,8 @@ NMOS6502::NMOS6502() {
 	SP = 0x0100;
 	ProcessorStatus = std::bitset<6>{0b000000};
 	BindOpcodes();
+	NMIPending = false;
+	IRQPending = false;
 }
 
 NMOS6502::~NMOS6502() {}
@@ -21,6 +23,8 @@ void NMOS6502::Reset() {
 	PC = 0xFFFC;
 	SP = 0x0100;
 	std::fill(Memory.begin(), Memory.end(), 0);
+	NMIPending = false;
+	IRQPending = false;
 }
 
 u8 NMOS6502::FetchByte()
@@ -57,6 +61,7 @@ void NMOS6502::IRQ() {
 	/* Set processor flags and push to stack */
 	Memory[SP] = static_cast<uint8_t>(ProcessorStatus.to_ulong());
 	PC = Memory[0xFFFA];
+	ProcessorStatus.reset(I);
 }
 
 void NMOS6502::NMI() {
@@ -68,10 +73,19 @@ void NMOS6502::NMI() {
 	/* Set processor flags and push to stack */
 	Memory[SP] = static_cast<uint8_t>(ProcessorStatus.to_ulong());
 	PC = Memory[0xFFFE];
+	ProcessorStatus.reset(I);
 }
 
 int NMOS6502::Execute(u32 CyclesRequired) {
 	CyclesPerformed = 0;
+	if (NMIPending) { // NMI/IRQ wires pull to logic-low when requesting interrupts
+		NMIPending = false; // Functionally putting the NMI wire on high
+		NMI();
+	}
+	if (IRQPending) {
+		IRQPending = false;
+		IRQ();
+	}
 	u8 Instruction = FetchByte();
 	(this->*Opcodes[Instruction])();
 	return CyclesPerformed;
